@@ -14,17 +14,20 @@ jobs:
       - name: Testing with version ${{ matrix.python-version }}
         uses: actions/setup-python@v2
         with:
-          python-version: ${{ matrix.python-versioon }}
-      - name: Install Conda
+          python-version: ${{ matrix.python-version }}
+      - uses: conda-incubator/setup-miniconda@v2
+        with:
+          auto-update-conda: true
+          python-version: ${{ matrix.python-version }}
+      - name: Conda info
+        shell: bash -el {0}
+        run: conda info
+      - name: Conda list
+        shell: pwsh
+        run: conda list
+      - name: Create Conda Test Environment
         run: |
-          wget https://repo.continuum.io/miniconda/Miniconda3-latest-Linux-x86_64.sh -O miniconda.sh;
-          bash miniconda.sh -b -p $HOME/miniconda
-          source $HOME/miniconda/etc/profile.d/conda.sh
-          hash -r
-          conda config --set always_yes yes --set changeps1 no
-          conda update -q conda
-          conda info -a
-          conda create -q -n test-environment python=${{ matrix.python-versioon }}
+          conda create -q -n test-environment python=${{ matrix.python-version }}
           conda activate test-environment
           conda install -c bioconda viennarna
       - name: Install Python dependencies
