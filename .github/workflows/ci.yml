@@ -25,10 +25,8 @@ jobs:
       - name: Conda list
         shell: pwsh
         run: conda list
-      - name: Create Conda Test Environment
+      - name: Install viennarna
         run: |
-          conda create -q -n test-environment python=${{ matrix.python-version }}
-          conda activate test-environment
           conda install -c bioconda viennarna
       - name: Install Python dependencies
         run: |
