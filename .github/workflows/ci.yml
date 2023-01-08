@@ -7,7 +7,7 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        python-version: [3.7, 3.8, 3.9]
+        python-version: [3.7, 3.8, 3.9, '3.10']
 
     steps:
       - uses: actions/checkout@v2
@@ -15,22 +15,20 @@ jobs:
         uses: actions/setup-python@v2
         with:
           python-version: ${{ matrix.python-version }}
-      - uses: conda-incubator/setup-miniconda@v2
-        with:
-          auto-update-conda: true
-          python-version: ${{ matrix.python-version }}
-      - name: Conda info
-        shell: bash -el {0}
-        run: conda info
-      - name: Conda list
-        shell: bash
-        run: conda list
-      - name: Install viennarna
+      - name: Build Conda Environment
         run: |
+          wget https://repo.anaconda.com/miniconda/Miniconda3-latest-Linux-x86_64.sh
+          mkdir /root/.conda
+          bash Miniconda3-latest-Linux-x86_64.sh -b
+          rm -f Miniconda3-latest-Linux-x86_64.sh
+          conda init bash
+          . /root/.bashrc
+          conda update conda
+          conda install -c bioconda pytest
           conda install -c bioconda viennarna
       - name: Install Python dependencies
         run: |
-          conda run -n test python -m pip install --upgrade pip
-          conda run -n test pip install -r requirements.txt
+          conda run -n base python -m pip install --upgrade pip
+          conda run -n base pip install -r requirements.txt
       - name: Run Tests
-        run: conda run -n test py.test
+        run: conda run -n base py.test
